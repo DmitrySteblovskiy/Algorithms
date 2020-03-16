@@ -1,3 +1,9 @@
+//Условие задачи:
+//Фрэнку опять прилетел новый заказ. Однако в этот раз город играет по очень странным правилам: 
+//все дороги в городе односторонние и связывают только офисы нанимателей перевозчика. Множество офисов, 
+//между любыми двумя из которых существует путь, образуют квартал, если нельзя добавить никакие другие, чтобы условие выполнялось. 
+//Фрэнку интересно, каково минимальное количество односторонних дорог нужно ещё построить, чтобы весь город стал квраталом.
+//https://contest.yandex.ru/contest/17228/run-report/31544153/
 #include <iostream>
 #include <vector>
 void reverse(std::vector<int> &vec);
@@ -87,7 +93,7 @@ void Curacao(std::vector<std::vector<int>> &reversed, std::vector<std::vector<in
         for (int j =0; j < graph[i].size(); j++)
         {
             std::pair<int, int> tm= check(harka, i, graph[i][j]);
-        //    std::cout<<tm.first<<" "<<tm.second<<std::endl;
+        
             if (tm.first!=tm.second)
                 condencionered[tm.first].push_back(tm.second);
         }
