@@ -3,7 +3,8 @@
 #include <math.h>
 #include <queue>
 #include <vector>
-
+# Для каждой вершины (которая является полицейский) проверяю, есть ли у нее ребра и далее произойдет ли ситуация, 
+#когда полицейский позвонит тому, от кого получил информацию (т.е. вершина уже использована в текущем поиске)
 
 void dfs(const std::vector <std::vector <int>> &graph, std::vector<int> &answer, std::vector<int> &used, int node, bool &cycle_checker, std::vector<bool> &blocked) {
 
