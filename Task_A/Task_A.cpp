@@ -3,7 +3,7 @@
 #include <math.h>
 #include <queue>
 #include <vector>
-
+# В каждой вершине графа считаем сумму расстояний до магазина для нашей троицы и затем выбираем минимальную сумму, как и требуется.
 
 
 void dfs(const std::vector <std::vector <int>> &graph, std::vector<int> &answer, std::vector<int> &used, int node, bool &cycle_checker, std::vector<bool> &blocked) {
