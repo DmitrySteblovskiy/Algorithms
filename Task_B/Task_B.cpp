@@ -2,6 +2,8 @@
 #include <queue>
 #include <vector>
 #include <limits>
+#https://contest.yandex.ru/contest/17594/run-report/32406182/
+#Используем алгоритм Дейкстры для нахождения кратчайшего пути (минимальной стоимости), при этом позволяя алгоритму сделать больше k шагов
 
 
 class Graph
