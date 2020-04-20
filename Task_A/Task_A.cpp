@@ -2,7 +2,8 @@
 #include <queue>
 #include <vector>
 #include <limits>
-
+#https://contest.yandex.ru/contest/17594/run-report/32370516/
+# Используем алгоритм Дейкстры для нахождения минимального числа потраченных Риком, не забывая про условия телепортации)
 
 class Graph
 {
