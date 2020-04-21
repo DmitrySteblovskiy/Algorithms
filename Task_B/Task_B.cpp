@@ -33,6 +33,18 @@ void inversion(std::vector<int> &answer) {
 	}
 }
 
+void sort_graph(std::vector <std::vector <int>> &graph, int n):
+		for (int i = 0; i < n; ++i) {
+		std::sort(graph[i].begin(), graph[i].end());
+	}
+
+void make_dfs(const std::vector <std::vector <int>> &graph, std::vector<int> &answer, std::vector<int> &used, bool &cycle_checker, std::vector<bool> &blocked, std::vector<bool> &traversed, int n):
+		for (int i = 0; i < n && not cycle_checker; ++i) {
+		if (traversed[i] == 0) {
+			dfs(graph, answer, used, i, cycle_checker, blocked);
+		}
+	}
+
 
 int main() {
 
@@ -52,16 +64,8 @@ int main() {
 		traversed[b] = true;
 	}
 
-	for (int i = 0; i < n; ++i) {
-		std::sort(graph[i].begin(), graph[i].end());
-	}
-
-	for (int i = 0; i < n && not cycle_checker; ++i) {
-		if (traversed[i] == 0) {
-			dfs(graph, answer, used, i, cycle_checker, blocked);
-		}
-	}
-
+	sort_graph(graph, n);
+	make_dfs(graph, answer, used, cycle_checker, blocked, traversed, n);
 	inversion(answer);
 
 	if ((!cycle_checker) && (!answer.empty())) {
@@ -75,5 +79,4 @@ int main() {
 		std::cout << "NO";
 	}
 
-	system("pause");
 }
