@@ -74,5 +74,4 @@ int main() {
 		std::cout << "NO";
 	}
 
-	system("pause");
 }
