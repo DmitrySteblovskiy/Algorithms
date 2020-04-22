@@ -35,8 +35,8 @@ void dfs1(std::vector<std::vector<int>> &g, int u, std::vector<int> &path, std::
     path.push_back(u);
 }
 
-void times(std::vector<std::vector<int>> &g, std::vector<int> &times)
-{
+void times(std::vector<std::vector<int>> &g, std::vector<int> &times) # Эта функция упорядочивает вершины графа по времени выхода, 
+{                                                                     # потому и называется times
     std::vector<bool> used(g.size(), false);
     for(size_t i = 0; i < g.size(); i++)
     {
@@ -62,7 +62,7 @@ std::pair<int,int> check(std::vector<int> &com, int xi, int yj){
     return std::pair<int, int> (com[xi],com[yj]);
 }
 
-void Curacao(std::vector<std::vector<int>> &reversed, std::vector<std::vector<int>> &graph){
+void Kosaraju(std::vector<std::vector<int>> &reversed, std::vector<std::vector<int>> &graph){
     
     std::vector<int> timesout;
     times(graph, timesout);
@@ -116,7 +116,7 @@ void Curacao(std::vector<std::vector<int>> &reversed, std::vector<std::vector<in
     }
     int zero1 = 0, zero2 = 0;
     
-    for (size_t i = 0; i <degs.size(); i++)
+    for (size_t i = 0; i < degs.size(); i++)
     {
         if(degs[i][0] == 0)
             zero1++;
@@ -144,6 +144,6 @@ int main()
         reversed[b - 1].push_back(a - 1);
     }
 
-    Curacao(reversed, graph);
-    return 0;
+    Kosaraju(reversed, graph);
+    
 }
