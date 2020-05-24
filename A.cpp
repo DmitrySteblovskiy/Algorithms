@@ -1,4 +1,4 @@
-﻿// Требуется найти в связном графе остовное дерево минимального веса. Воспользуйтесь алгоритмом Прима.
+// Требуется найти в связном графе остовное дерево минимального веса. Воспользуйтесь алгоритмом Прима.
 // https://contest.yandex.ru/contest/17986/run-report/33076537/
 //
 // Используя priority_queue алгоритм Прима постепенно находит MST графа из веса top элемента очереди: answer += top.weight
@@ -18,11 +18,11 @@ int Sum(std::vector<int> min_) {
 	return sum;
 }
 
-class edge {
+class Edge {
 public:
 	int to, weight;
 
-	edge(int to_, int weight_)
+	Edge(int to_, int weight_)
 	{
 		to = to_;
 		weight = weight_;
@@ -30,9 +30,9 @@ public:
 };
 
 
-class compare {
+class Compare {
 public:
-	bool operator() (const edge& a, const edge& b) const {
+	bool operator() (const Edge& a, const Edge& b) const {
 		return a.weight > b.weight;
 	}
 };
@@ -41,8 +41,8 @@ public:
 int Prim(int n, int m)
 {
 	std::vector<bool> used;
-	std::vector<std::vector<edge>> elements;
-	std::priority_queue<edge, std::vector<edge>, compare> nodes;
+	std::vector<std::vector<Edge>> elements;
+	std::priority_queue<Edge, std::vector<Edge>, Compare> nodes;
 	used.resize(n);
 	elements.resize(n);
 	int from, to, cost, answer, curr, nearest;
@@ -59,14 +59,14 @@ int Prim(int n, int m)
 	}
 	used[0] = true;
 
-	for (edge near : elements[0])
+	for (Edge near : elements[0])
 	{
 		nodes.push(near);
 	}
 
 
 	while ((0 < nodes.size()) && (curr < n)) {
-		edge top = nodes.top();
+		Edge top = nodes.top();
 		nodes.pop();
 		if (used[top.to]) {
 			continue;
@@ -76,7 +76,7 @@ int Prim(int n, int m)
 		++curr;
 
 
-		for (edge near_ : elements[top.to])
+		for (Edge near_ : elements[top.to])
 		{
 			if (!used[near_.to])
 			{
@@ -94,6 +94,4 @@ int main()
 	int n, m;
 	std::cin >> n >> m;
 	std::cout << Prim(n, m);
-
-	system("pause");
 }
