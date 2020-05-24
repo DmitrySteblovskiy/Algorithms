@@ -1,4 +1,4 @@
-﻿// Вам дан неориентированный граф, состоящий из n вершин. На каждой вершине записано число; число, записанное на вершине i, равно ai. Изначально в графе нет ни одного ребра.
+// Вам дан неориентированный граф, состоящий из n вершин. На каждой вершине записано число; число, записанное на вершине i, равно ai. Изначально в графе нет ни одного ребра.
 // Вы можете добавлять ребра в граф за определенную стоимость. За добавление ребра между вершинами x и y надо заплатить ax + ay монет. Также существует m специальных 
 // предложений, каждое из которых характеризуется тремя числами x, y и w, и означает, что можно добавить ребро между вершинами x и y за w монет. Эти специальные предложения не 
 // обязательно использовать: если существует такая пара вершин x и y, такая, что для нее существует специальное предложение, можно все равно добавить ребро между ними за ax + ay монет.
@@ -16,7 +16,7 @@
 
 const size_t longest = std::numeric_limits<size_t>::max();
 
-size_t Min_(size_t e1, size_t e2) {
+size_t Min(size_t e1, size_t e2) {
 	if (e1 <= e2) {
 		return e1;
 	}
@@ -25,7 +25,7 @@ size_t Min_(size_t e1, size_t e2) {
 	}
 }
 
-size_t Max_(size_t e1, size_t e2) {
+size_t Max(size_t e1, size_t e2) {
 	if (e1 >= e2) {
 		return e1;
 	}
@@ -45,7 +45,7 @@ public:
 	}
 };
 
-class compare {
+class Compare {
 public:
 	int operator()(const Edge &e1, const Edge &e2) {
 		return e1.dist > e2.dist;
@@ -58,7 +58,7 @@ public:
 
 	Graph(size_t n) : graph(n) {}
 
-	void new_(size_t from, size_t to, size_t weight) {
+	void add(size_t from, size_t to, size_t weight) {
 		if (to != -1)
 			graph[from].emplace_back(std::make_pair(to, weight));
 	}
@@ -69,7 +69,7 @@ public:
 
 };
 
-size_t min_weight(const Graph &graph, std::priority_queue<Edge, std::vector<Edge>, compare> &queue, std::vector<size_t> dist, size_t n) {
+size_t minWeight(const Graph &graph, std::priority_queue<Edge, std::vector<Edge>, Compare> &queue, std::vector<size_t> dist, size_t n) {
 	size_t res = 0;
 	std::vector<size_t> used(n, 0);
 	used[0] = 1;
@@ -92,9 +92,9 @@ size_t min_weight(const Graph &graph, std::priority_queue<Edge, std::vector<Edge
 	return res;
 }
 
-void answer(size_t n, size_t m) {
+void countAnswer(size_t n, size_t m) {
 	Graph graph_ = Graph(n);
-	std::priority_queue<Edge, std::vector<Edge>, compare> queue;
+	std::priority_queue<Edge, std::vector<Edge>, Compare> queue;
 	std::vector<size_t> min_dists(n, longest);
 	min_dists[0] = 0;
 	std::vector<size_t> a = std::vector<size_t>(n);
@@ -110,36 +110,36 @@ void answer(size_t n, size_t m) {
 
 	for (size_t i = 0; i < n; ++i) {
 		if (i != min) {
-			graph_.new_(min, i, a[min] + a[i]);
-			graph_.new_(i, min, a[min] + a[i]);
+			graph_.add(min, i, a[min] + a[i]);
+			graph_.add(i, min, a[min] + a[i]);
 			if (!min) {
-				min_dists[i] = Min_(min_dists[i], a[min] + a[i]);
+				min_dists[i] = Min(min_dists[i], a[min] + a[i]);
 			}
 		}
 		else {
-			graph_.new_(min, min, longest);
+			graph_.add(min, min, longest);
 		}
 	}
 
-	min_dists[min] = Min_(min_dists[min], a[0] + a[min]);
+	min_dists[min] = Min(min_dists[min], a[0] + a[min]);
 	for (size_t i = 0; i < m; ++i) {
 		size_t a1, a2, weight;
 		std::cin >> a1 >> a2 >> weight;
-		size_t from = Min_(--a1, --a2);
-		size_t to = Max_(a1, a2);
+		size_t from = Min(--a1, --a2);
+		size_t to = Max(a1, a2);
 
 		if ((from == min) || (to == min)) {
 			graph_.graph[min][(from == min ? to : from)].second =
-				Min_(graph_.graph[min][(from == min ? to : from)].second, weight);
+				Min(graph_.graph[min][(from == min ? to : from)].second, weight);
 			graph_.graph[(from == min ? to : from)][0].second =
-				Min_(graph_.graph[(from == min ? to : from)][0].second, weight);
+				Min(graph_.graph[(from == min ? to : from)][0].second, weight);
 		}
 		else {
-			graph_.new_(from, to, Min_(weight, a[from] + a[to]));
-			graph_.new_(to, from, Min_(weight, a[from] + a[to]));
+			graph_.add(from, to, Min(weight, a[from] + a[to]));
+			graph_.add(to, from, Min(weight, a[from] + a[to]));
 		}
 		if (!from) {
-			min_dists[to] = Min_(min_dists[to], Min_(weight, a[from] + a[to]));
+			min_dists[to] = Min(min_dists[to], Min(weight, a[from] + a[to]));
 		}
 	}
 
@@ -147,7 +147,7 @@ void answer(size_t n, size_t m) {
 		queue.emplace(Edge(i, min_dists[i]));
 	}
 
-	std::cout << min_weight(graph_, queue, min_dists, n);
+	std::cout << minWeight(graph_, queue, min_dists, n);
 }
 
 
@@ -155,7 +155,7 @@ int main() {
 	size_t n, m;
 	std::cin >> n >> m;
 
-	answer(n, m);
+	countAnswer(n, m);
 
 	system("pause");
 }
