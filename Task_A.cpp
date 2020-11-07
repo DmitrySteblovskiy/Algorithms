@@ -8,7 +8,7 @@
 // Сначала считаем префикс-функцию для шаблона (используя функцию pref_pattern), затем для всех символов строки (цикл ниже). В случае, если pref функция символа равна длине паттерна,
 // то это и есть одно из "вхождений". В цикле находим все возможные вхождения, запоминая их номера, которые необходимо вывести.
 
-std::vector<size_t> pref_pattern(const std::string &pattern, const std::string &str) {
+std::vector<size_t> PrefPattern(const std::string &pattern, const std::string &str) {
     std::vector<size_t> patt(pattern.length());
     patt[0] = 0;
 
@@ -29,7 +29,7 @@ std::vector<size_t> pref_pattern(const std::string &pattern, const std::string &
 
 std::vector<size_t> FindEntries(const std::string &pattern, const std::string &str) {
         std::vector<size_t> patt(pattern.length());
-        patt = pref_pattern(pattern, str);
+        patt = PrefPattern(pattern, str);
     
     std::vector<size_t> entries;
     size_t prev_patt = 0;
@@ -53,19 +53,19 @@ std::vector<size_t> FindEntries(const std::string &pattern, const std::string &s
     return entries;
 }
 
-void Answer(const std::string &pattern, const std::string &str) {
-    std::vector<size_t> entries = FindEntries(pattern, str);
-    for (size_t i : entries) {
-        std::cout << i << " ";
-    }
-
-}
+//size_t Solve(const std::string &pattern, const std::string &str, std::vector<size_t> &entries, size_t i) {
+//        return i;
+//}
 
 
 int main() {
     std::string pattern, str;
     std::cin >> pattern >> str;
 
-    Answer(pattern, str);
+    std::vector<size_t> entries = FindEntries(pattern, str);
+
+    for (size_t i : entries) {
+        std::cout << i << " ";
+    }
     //system("pause");
 }
