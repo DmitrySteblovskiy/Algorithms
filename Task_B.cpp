@@ -8,33 +8,34 @@
 // Для каждой позиции i = 0...(n-1) найдём значения nechet[i] и chet[i], обозначающие количество палиндромов соответственно нечётной и чётной длины с центром в позиции i. 
 // Тогда чечевидно, что искомым число подстрок-палиндромов будет сумма всех элементов двух векторов за вычетом числа палиндромов длиной в одну букву (их - str.length()).
 
-long palindroms(std::string str, long len) {
-    std::vector<long> nechet(len);   // для подпалиндромов нечётной длины
+long Palindroms(std::string str) {
+    long len = str.length();
+    std::vector<long> odd(len);   // для подпалиндромов нечётной длины
     long left = 0;
     long right = -1;
 
     for (long i = 0; i < len; ++i) {
-        long k = i > right ? 1 : std::min (nechet[left + right - i], right - i + 1);
+        long k = i > right ? 1 : std::min (odd[left + right - i], right - i + 1);
         while (((i + k) < len) && ((i - k) >= 0) && (str[i + k] == str[i - k])) {
             ++k;
         }
-        nechet[i] = k;
+        odd[i] = k;
         if (i + k - 1 > right) {
             left = i - k + 1;
             right = i + k - 1;
         }
     }
 
-    std::vector<long> chet(len);   // для подпалиндромов чётной длины
+    std::vector<long> even(len);   // для подпалиндромов чётной длины
     left = 0;
     right = -1;
 
     for (long  i = 0; i < len; ++i) {
-        long k = i > right ? 0 : std::min (chet[left + right - i + 1], right - i + 1);
+        long k = i > right ? 0 : std::min (even[left + right - i + 1], right - i + 1);
         while (i + k < len && i - k - 1 >= 0 && str[i + k] == str[i - k - 1]) {
             ++k;
         }
-        chet[i] = k;
+        even[i] = k;
         if (i + k - 1 > right) {
             left = i - k,  right = i + k - 1;
         }
@@ -42,8 +43,8 @@ long palindroms(std::string str, long len) {
     
     long answer = 0;
     for(long i = 0; i < len; ++i) {
-        answer += nechet[i];
-        answer += chet[i];
+        answer += odd[i];
+        answer += even[i];
     }
 
     return (answer - len);
@@ -53,9 +54,8 @@ long palindroms(std::string str, long len) {
 int main() {
     std::string str;
     std::cin >> str;
-    long len = str.length();
 
-    std::cout << palindroms(str, len);
+    std::cout << Palindroms(str);
 
     //system("pause");
 }
