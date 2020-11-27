@@ -10,44 +10,36 @@
 
 long Palindroms(std::string str) {
     long len = str.length();
-    std::vector<long> odd(len);   // для подпалиндромов нечётной длины
+    std::vector<long> res(len, 0);   // для подпалиндромов нечётной длины
     long left = 0;
     long right = -1;
+    bool evenness;
 
     for (long i = 0; i < len; ++i) {
-        long k = i > right ? 1 : std::min (odd[left + right - i], right - i + 1);
-        while (((i + k) < len) && ((i - k) >= 0) && (str[i + k] == str[i - k])) {
-            ++k;
-        }
-        odd[i] = k;
-        if (i + k - 1 > right) {
-            left = i - k + 1;
-            right = i + k - 1;
-        }
+        evenness = 0;
+
+        do {
+            long k = i > right ? (!evenness) : std::min (res[left + right - i + static_cast<long>(evenness)], right - i + 1);
+            while (((i + k) < len) && ((i - k - static_cast<long>(evenness)) >= 0) && (str[i + k] == str[i - k - static_cast<long>(evenness)])) {
+                ++k;
+            }
+            res[i] += k;
+
+            if (i + k - 1 > right) {
+                left = i - k + static_cast<long>(!evenness);
+                right = i + k - 1;
+            }
+            evenness = !evenness;
+
+        } while (evenness != false);
     }
 
-    std::vector<long> even(len);   // для подпалиндромов чётной длины
-    left = 0;
-    right = -1;
-
-    for (long  i = 0; i < len; ++i) {
-        long k = i > right ? 0 : std::min (even[left + right - i + 1], right - i + 1);
-        while (i + k < len && i - k - 1 >= 0 && str[i + k] == str[i - k - 1]) {
-            ++k;
-        }
-        even[i] = k;
-        if (i + k - 1 > right) {
-            left = i - k,  right = i + k - 1;
-        }
-    }
-    
     long answer = 0;
-    for(long i = 0; i < len; ++i) {
-        answer += odd[i];
-        answer += even[i];
+    for (long i = 0; i < len; ++i) {
+        answer += res[i];
     }
 
-    return (answer - len);
+    return (answer - len - 1);
 }
 
 
