@@ -9,48 +9,56 @@
 // то это и есть одно из "вхождений". В цикле находим все возможные вхождения, запоминая их номера, которые необходимо вывести.
 
 std::vector<size_t> PrefPattern(const std::string &pattern, const std::string &str) {
-    std::vector<size_t> patt(pattern.length());
-    patt[0] = 0;
+    std::vector<size_t> pi_func(pattern.length());
+    pi_func[0] = 0;
 
     for (size_t i = 1; i < pattern.length(); ++i) {
-        size_t j = patt[i - 1];
-        while ((pattern[i] != pattern[j]) && (j > 0)) {
-            j = patt[j - 1];
-        }
-        if (pattern[j] != pattern[i]) {
-            patt[i] = 0;
-        }
-        else {
-            patt[i] = j + 1;
-        }
+        pi_func[i] = GetNextPi(pattern, pi_func, pi_func[i - 1], i, pattern[i]);
     }
-    return patt;
+
+    return pi_func;
 }
 
 std::vector<size_t> FindEntries(const std::string &pattern, const std::string &str) {
-        std::vector<size_t> patt(pattern.length());
-        patt = PrefPattern(pattern, str);
+    std::vector<size_t> pi_func(pattern.length());
+    pi_func = PrefPattern(pattern, str);
     
     std::vector<size_t> entries;
-    size_t prev_patt = 0;
+    size_t prev_pi = 0;
 
     for (size_t i = 0; i < str.size(); ++i) {
-        size_t j = prev_patt;
-        while ((j > 0) && (str[i] != pattern[j])) {
-            j = patt[j - 1];
-        }
-        if (str[i] == pattern[j]) {
-            ++j;
-        }
-        else {
-            j = 0;
-        }
+        size_t j = prev_pi;
+
+        j = GetNextPi(pattern, pi_func, prev_pi, i, str[i]);
+
         if (j == pattern.length()) {
             entries.push_back(i + 1 - pattern.length());
         }
         prev_patt = j;
     }
+
     return entries;
+}
+
+
+size_t GetNextPi(const std::string &pattern, std::vector<size_t> pi_func, size_t prev, size_t i, char cur_symbol) {
+    size_t j = prev;
+
+    while ((pattern[j] != cur_symbol) && (j > 0)) {
+        j = pi_func[j - 1];
+    }
+
+    if (cur_symbol == pattern[j]) {
+        if (cur_symbol == pattern[i]) {
+            pi_func[i] = j + 1;
+            return pi_func[i];
+        } else {
+            ++j;
+            return j;
+        }
+    } else {
+        return 0;
+    }
 }
 
 //size_t Solve(const std::string &pattern, const std::string &str, std::vector<size_t> &entries, size_t i) {
