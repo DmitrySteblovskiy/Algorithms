@@ -1,6 +1,6 @@
 #include <iostream>
-#include <vector>
 #include <limits.h>
+#include <vector>
 
 // Шаблон поиска задан строкой длины m, в которой кроме обычных символов могут встречаться символы “?”. Найти позиции всех вхождений шаблона в тексте длины n. 
 // Каждое вхождение шаблона предполагает, что все обычные символы совпадают с соответствующими из текста, а вместо символа “?” в тексте встречается произвольный символ. 
@@ -15,45 +15,45 @@ class AhoCorasickMachine {
 private:
 
     struct Vertex {     // Структура, соответвующая вершине бора и создающая ее без исходящих вершин и суффиксных сыллок, не являющуюся концом шаблона
-     // где parent - индекс родителя, а parentChar (символ на ребре) - данная вершина.
+     // где parent - индекс родителя, а parent_char (символ на ребре) - данная вершина.
     
-        Vertex(int parent, char parentChar): parentChar(parentChar), parent(parent), suffixLink(-1), isPattern(false) {
+        Vertex(int parent, char parent_char): parent_char(parent_char), parent(parent), suffix_link(-1), is_pattern(false) {
             for (size_t j = 0; j < ALPHABET_SIZE; ++j) {
                 edges[j] = -1;
-                fastMove[j] = -1;
+                fast_move[j] = -1;
             }
         }
 
         int parent;
-        char parentChar;
-        bool isPattern;    // флаг конца шаблона 
+        char parent_char;
+        bool is_pattern;    // флаг конца шаблона 
 
         int edges[ALPHABET_SIZE];   // исходящие вершины
     
-        int fastMove[ALPHABET_SIZE];    // переходы из вершины
+        int fast_move[ALPHABET_SIZE];    // переходы из вершины
     
-        int suffixLink;   // ссылка из данной вершины
+        int suffix_link;   // ссылка из данной вершины
 
-        std::vector<int> indicesOfPattern;    // шаблоны, с которыми связана вершина
+        std::vector<int> indices_of_pattern;    // шаблоны, с которыми связана вершина
     };
 
 
-    void addPattern(const std::pair<int, int> &submaskPos, int pattIndex) {     // добавляет шаблон в бор; использует поле submaskPos пара <int, int> (начало и конец строки), // а pattIndex - номер шаблона.
+    void AddPattern(const std::pair<int, int> &submaskPos, int pattIndex) {     // добавляет шаблон в бор; использует поле submaskPos пара <int, int> (начало и конец строки), // а pattIndex - номер шаблона.
         int current_vertex = 0;
         for (int i = submaskPos.first; i <= submaskPos.second; ++i) {
             char character = mask_[i] - 'a';
-            if (bohr_[current_vertex].edges[character] == -1) {
-                bohr_.emplace_back(Vertex(current_vertex, character));
-                bohr_[current_vertex].edges[character] = static_cast<int>((bohr_.size() - 1));
+            if (trie_[current_vertex].edges[character] == -1) {
+                trie_.emplace_back(Vertex(current_vertex, character));
+                trie_[current_vertex].edges[character] = static_cast<int>((trie_.size() - 1));
             }
-            current_vertex = bohr_[current_vertex].edges[character];
+            current_vertex = trie_[current_vertex].edges[character];
         }
-        bohr_[current_vertex].isPattern = true;
-        bohr_[current_vertex].indicesOfPattern.emplace_back(pattIndex);
+        trie_[current_vertex].is_pattern = true;
+        trie_[current_vertex].indices_of_pattern.emplace_back(pattIndex);
     }
 
    
-    void findSubmaskPositions(const std::string &mask){     // находит подшаблоны без вопросов в маске, записывая результат в submask_positions_.
+    void FindSubmaskPositions(const std::string &mask){     // находит подшаблоны без вопросов в маске, записывая результат в submask_positions_.
         std::pair<int, int> current_submask_pos;
         if (isalpha(mask[0])) {
             current_submask_pos.first = 0;
@@ -83,71 +83,71 @@ private:
     }
 
     std::string mask_;
-    std::vector<Vertex> bohr_;  
+    std::vector<Vertex> trie_;  
     std::vector<std::pair<int, int>> submask_positions_;
 
-    int getSuffixLink(int index){
-        if (bohr_[index].suffixLink == -1) {
+    int GetSuffixLink(int index) {
+        if (trie_[index].suffix_link == -1) {
             // если ссылка не определена и вершина - сын корня, то зададим ссылку на корень, если нет - ищем рекурсивно
-            if (!bohr_[index].parent) {
-                bohr_[index].suffixLink = 0;
+            if (!trie_[index].parent) {
+                trie_[index].suffix_link = 0;
             }
             else {
-                bohr_[index].suffixLink = getLink(getSuffixLink(bohr_[index].parent), bohr_[index].parentChar);
+                trie_[index].suffix_link = GetLink(GetSuffixLink(trie_[index].parent), trie_[index].parent_char);
             }
         }
-        return bohr_[index].suffixLink;
+        return trie_[index].suffix_link;
     }
 
 
-    int getLink(int index, char character){
-        if (bohr_[index].fastMove[character] == -1) {
-            if (bohr_[index].edges[character] != -1) {
-                bohr_[index].fastMove[character] = bohr_[index].edges[character];
+    int GetLink(int index, char character) {
+        if (trie_[index].fast_move[character] == -1) {
+            if (trie_[index].edges[character] != -1) {
+                trie_[index].fast_move[character] = trie_[index].edges[character];
             }
             else if (!index) {
-                bohr_[index].fastMove[character] = 0;
+                trie_[index].fast_move[character] = 0;
             }
             else {
-                bohr_[index].fastMove[character] = getLink(getSuffixLink(index), character);
+                trie_[index].fast_move[character] = GetLink(GetSuffixLink(index), character);
             }
         }
-        return bohr_[index].fastMove[character];
+        return trie_[index].fast_move[character];
     }
 
 
 public:
 
-    AhoCorasickMachine(const std::string &mask) : bohr_(1, Vertex(0, -1)), mask_(mask) {    // создает карася по подшаблонам без ? из маски
-        bohr_[0].suffixLink = 0;
-        findSubmaskPositions(mask);
+    AhoCorasickMachine(const std::string &mask) : trie_(1, Vertex(0, -1)), mask_(mask) {    // создает карася по подшаблонам без ? из маски
+        trie_[0].suffix_link = 0;
+        FindSubmaskPositions(mask);
         for (size_t i = 0; i < submask_positions_.size(); ++i) {
-            addPattern(submask_positions_[i], i);
+            AddPattern(submask_positions_[i], i);
         }
     }
 
-    std::vector<int> findMatches(const std::string &text){    // ищет вхождения маски в тексте, возвращая vector индексов вхождений
+    std::vector<int> FindMatches(const std::string &text) {    // ищет вхождения маски в тексте, возвращая vector индексов вхождений
         std::vector<int> entries(text.length());
          int v = 0;
     
         for (int i = 0; i < text.length(); ++i) {   // ищем вхождения всех подшаблонов и увеличиваем счетчик вхождений в индексе, соответвующем началу mask
-            v = getLink(v, text[i] - 'a');
+            v = GetLink(v, text[i] - 'a');
             int u = v;
 
             do {
-                if (bohr_[u].isPattern) {
-                    for (size_t index = 0; index < bohr_[u].indicesOfPattern.size(); ++index) {
+                if (trie_[u].is_pattern) {
+                    for (size_t index = 0; index < trie_[u].indices_of_pattern.size(); ++index) {
 
-                        int startIndex = i - submask_positions_[bohr_[u].indicesOfPattern[index]].second
-                            + submask_positions_[bohr_[u].indicesOfPattern[index]].first;
+                        int startIndex = i - submask_positions_[trie_[u].indices_of_pattern[index]].second
+                            + submask_positions_[trie_[u].indices_of_pattern[index]].first;
 
-                        if ((startIndex - submask_positions_[bohr_[u].indicesOfPattern[index]].first >= 0) && 
-                        (startIndex - submask_positions_[bohr_[u].indicesOfPattern[index]].first + mask_.length() - 1 < text.length())) {
-                        entries[startIndex - submask_positions_[bohr_[u].indicesOfPattern[index]].first]++;
+                        if ((startIndex - submask_positions_[trie_[u].indices_of_pattern[index]].first >= 0) && 
+                        (startIndex - submask_positions_[trie_[u].indices_of_pattern[index]].first + mask_.length() - 1 < text.length())) {
+                        entries[startIndex - submask_positions_[trie_[u].indices_of_pattern[index]].first]++;
                         }
                     }
                 }
-                u = getSuffixLink(u);
+                u = GetSuffixLink(u);
             } while (u != 0);
         }
 
@@ -157,10 +157,24 @@ public:
                 result.emplace_back(i);
             }
         }
+
         return result;
     }
-
 };
+
+int Solve (std::string pattern, std::string text, size_t i) {
+    int lenpat = pattern.length();
+    int lentex = text.length();
+    AhoCorasickMachine ahoCorasickMachine(pattern);
+
+    std::vector<int> entries = ahoCorasickMachine.FindMatches(text);
+    if (entries[i] <= (lentex - lenpat)) {
+        return entries[i];
+    }
+    else {
+        return;
+    }
+}
 
 
 int main() {
@@ -171,14 +185,9 @@ int main() {
     int lentex = text.length();
     AhoCorasickMachine ahoCorasickMachine(pattern);
 
-    std::vector<int> entries = ahoCorasickMachine.findMatches(text);
+    std::vector<int> entries = ahoCorasickMachine.FindMatches(text);
     for (size_t i = 0; i < entries.size(); ++i) {
-        if (entries[i] <= (lentex - lenpat)){
-            std::cout << entries[i] << " ";
-        }
-        else {
-            break;
-        }
+        std::cout << Solve(pattern, text, i) << " ";
     }
 
     //system("pause");
