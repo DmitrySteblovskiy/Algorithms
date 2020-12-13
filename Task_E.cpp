@@ -4,7 +4,7 @@
 #include <vector>
 
 // Даны строки s и t. Постройте сжатое суффиксное дерево, которое содержит все суффиксы строки s и строки t. Найдите такое дерево, которое содержит минимальное количество вершин
-// https://contest.yandex.ru/contest/20019/run-report/36980825/
+// https://contest.yandex.ru/contest/20019/run-report/45159825/
 
 class SuffixTree {
 public:
@@ -16,158 +16,154 @@ public:
         int parent;
         std::map<char, int> next;
  
-        Vertex (int l = -1, int r = -1, int par = -1) : left(l), right(r), parent(par), link(0) {
-            
-        }
+        Vertex(int l = -1, int r = -1, int par = -1) : left(l), right(r), parent(par), link(0) {}
     };
 
-    struct State {    // здесь node - вершина текущего суффикса, а pos - положение в строке соответствующее месту на ребре от tree[v].left до tree[v].right
+    struct State {    // здесь node - вершина текущего суффикса, а pos - положение в строке соответствующее месту на ребре от tree_[v].left до tree_[v].right
         int node;
         int pos;
-        State (int node, int pos) : node(node), pos(pos)  {
-            
-        }
+        State(int node, int pos) : node(node), pos(pos)  {}
     };
 
-    void buildTree() {  // построение
-        for (size_t i = 2; i < tree.size(); ++i) {
-            tree[i].right = sourceLen - 1;
-        }
- 
-        for (char ch = 'a'; ch <= 'z'; ++ch) {
-            tree[1].next[ch] = 0;
-        }
-        tree[1].next['#'] = 0;
-        tree[1].next['$'] = 0;
-        tree[0].link = 1;
- 
-        for (int i = 0; i < sourceLen; ++i) {
-            addLetter(sourceStr[i]);
-            ++currentPos;
-        }
-    }
-
-    SuffixTree (const std::string& source, int fLen) : firstLen(fLen), St(0, 0), sourceStr(source), size(2), currentPos(0), sourceLen(static_cast<int>(source.length())) {
-        tree.resize(sourceLen * 2);
+    SuffixTree(const std::string& source, int fLen) : first_len_(fLen), St_(0, 0), source_str_(source), size_(2), current_pos_(0), source_len_(static_cast<int>(source.length())) {
+        tree_.resize(source_len_ * 2);
         Vertex root;
-        tree[0] = root;
+        tree_[0] = root;
 
-        buildTree();
+        BuildTree();
     }
 
 
-    void addLetter (char ch) {  // добавление новой буквы с соблюдением правил сжатого суфф. дерева
-        if (St.pos > tree[St.node].right) {
-            while ((tree[St.node].next.find(ch) == tree[St.node].next.end())) {
-                tree[St.node].next[ch] = size;
-                tree[size].left = currentPos;
-                tree[size++].parent = St.node;
-                St.node = tree[St.node].link;
-                St.pos = tree[St.node].right + 1;
-                if (St.pos <= tree[St.node].right) {
+    void AddLetter(char ch) {  // добавление новой буквы с соблюдением правил сжатого суфф. дерева
+        if (St_.pos > tree_[St_.node].right) {
+            while ((tree_[St_.node].next.find(ch) == tree_[St_.node].next.end())) {
+                tree_[St_.node].next[ch] = size_;
+                tree_[size_].left = current_pos_;
+                tree_[size_++].parent = St_.node;
+                St_.node = tree_[St_.node].link;
+                St_.pos = tree_[St_.node].right + 1;
+                if (St_.pos <= tree_[St_.node].right) {
                     break;
                 }
             }
 
-        if (St.pos > tree[St.node].right) {
-                St.node = tree[St.node].next[ch];
-                St.pos = tree[St.node].left;
+        if (St_.pos > tree_[St_.node].right) {
+                St_.node = tree_[St_.node].next[ch];
+                St_.pos = tree_[St_.node].left;
             }
         }
 
-        addLetter2 (ch);
+        FixingSuffTree(ch);
     }
 
-    void addLetter2 (char ch) {
-        if ((St.pos == -1) || (sourceStr[St.pos] == ch)) {
-            ++St.pos;
+    void FixingSuffTree(char ch) {
+        if ((St_.pos == -1) || (source_str_[St_.pos] == ch)) {
+            ++St_.pos;
         } else {
-            tree[size] = Vertex(tree[St.node].left, St.pos - 1, tree[St.node].parent);
-            tree[size].next[sourceStr[St.pos]] = St.node;
-            tree[size].next[ch] = size + 1;
-            tree[size+1].left = currentPos;
-            tree[size+1].parent = size;
+            tree_[size_] = Vertex(tree_[St_.node].left, St_.pos - 1, tree_[St_.node].parent);
+            tree_[size_].next[source_str_[St_.pos]] = St_.node;
+            tree_[size_].next[ch] = size_ + 1;
+            tree_[size_+1].left = current_pos_;
+            tree_[size_+1].parent = size_;
 
-            tree[St.node].left = St.pos;
-            tree[St.node].parent = size;
-            tree[tree[size].parent].next[sourceStr[ tree[size].left] ] = size;
-            ++ ++size;
+            tree_[St_.node].left = St_.pos;
+            tree_[St_.node].parent = size_;
+            tree_[tree_[size_].parent].next[source_str_[ tree_[size_].left] ] = size_;
+            ++ ++size_;
 
-            St.node = tree[tree[size-2].parent].link;
-            St.pos = tree[size-2].left;
+            St_.node = tree_[tree_[size_-2].parent].link;
+            St_.pos = tree_[size_-2].left;
 
-            while (tree[size-2].right >= St.pos) {
-                St.node = tree[St.node].next[sourceStr[St.pos]];
-                St.pos += 1 + tree[St.node].right - tree[St.node].left;
+            while (tree_[size_-2].right >= St_.pos) {
+                St_.node = tree_[St_.node].next[source_str_[St_.pos]];
+                St_.pos += 1 + tree_[St_.node].right - tree_[St_.node].left;
             }
 
-            if (St.pos == tree[size-2].right + 1) {
-                tree[size-2].link = St.node;
+            if (St_.pos == tree_[size_-2].right + 1) {
+                tree_[size_-2].link = St_.node;
             }
             else {
-                tree[size-2].link = size;
+                tree_[size_-2].link = size_;
             }
 
-            St.pos = tree[St.node].right - (St.pos - tree[size-2].right) + 2;
-            addLetter (ch);
+            St_.pos = tree_[St_.node].right - (St_.pos - tree_[size_-2].right) + 2;
+            AddLetter(ch);
         }
     }
 
 
-    void DFS (int vertexNum) {      // поиск в глубину - здесь заодно выводим описания вершин дерева
-        used[vertexNum] = true;
+    void PrintVertices(int vertexNum) {      // поиск в глубину - здесь заодно выводим описания вершин дерева
+        used_[vertexNum] = true;
         if (vertexNum) {
-            reNum[vertexNum] = iter;
-            ++iter;
+            re_num_[vertexNum] = iter_;
+            ++iter_;
             
-            std::cout << reNum[tree[vertexNum].parent] << " ";
+            std::cout << re_num_[tree_[vertexNum].parent] << " ";
  
-            if (tree[vertexNum].left < firstLen) {
+            if (tree_[vertexNum].left < first_len_) {
                 std::cout << 0 << " ";
-                std::cout << tree[vertexNum].left << " " << (tree[vertexNum].right < firstLen ? tree[vertexNum].right + 1 : firstLen) << "\n";
+                std::cout << tree_[vertexNum].left << " " << (tree_[vertexNum].right < first_len_ ? tree_[vertexNum].right + 1 : first_len_) << "\n";
         } else {
                 std::cout << 1 << " ";
-                std::cout << tree[vertexNum].left - firstLen << " " <<  tree[vertexNum].right - firstLen + 1 << "\n";
+                std::cout << tree_[vertexNum].left - first_len_ << " " <<  tree_[vertexNum].right - first_len_ + 1 << "\n";
             }
         }
  
-        for (auto elem : tree[vertexNum].next) {
-            if (!used[elem.second])
-                DFS(elem.second);
+        for (auto elem : tree_[vertexNum].next) {
+            if (!used_[elem.second])
+                PrintVertices(elem.second);
             }
         }
     
     void Answer() {     // выводим количество вершин дерева
-        iter = 1;
-        used.resize(size, false);
-        reNum.resize(size, 0);
-        reNum[0] = 0;
+        iter_ = 1;
+        used_.resize(size_, false);
+        re_num_.resize(size_, 0);
+        re_num_[0] = 0;
 
-        std::cout << size - 1 << "\n";
+        std::cout << size_ - 1 << "\n";
 
-        DFS(0);
+        PrintVertices(0);
+        iter_ = 1;
     }
 
 private:
 
-    size_t size;
-    int iter;
-    int currentPos;
-    int sourceLen;
-    int firstLen;
-    
-    std::vector<int> reNum;    
-    std::string sourceStr;
-    std::vector<bool> used;    
-    std::vector<Vertex> tree;
+    size_t size_;
+    int iter_;
+    int current_pos_;
+    int source_len_;
+    int first_len_;
 
-    State St;
+    std::vector<int> re_num_;    
+    std::string source_str_;
+    std::vector<bool> used_;    
+    std::vector<Vertex> tree_;
+
+    State St_;
+
+    void BuildTree() {  // построение
+        for (size_t i = 2; i < tree_.size(); ++i) {
+            tree_[i].right = source_len_ - 1;
+        }
+ 
+        for (char ch = 'a'; ch <= 'z'; ++ch) {
+            tree_[1].next[ch] = 0;
+        }
+        tree_[1].next['#'] = 0;
+        tree_[1].next['$'] = 0;
+        tree_[0].link = 1;
+ 
+        for (int i = 0; i < source_len_; ++i) {
+            AddLetter(source_str_[i]);
+            ++current_pos_;
+        }
+    }
 };
 
 
 int main() {
-	std::ios::sync_with_stdio(false);
-	
+    std::ios::sync_with_stdio(false);
 
     std::string str1, str2, answ;
     std::cin >> str1 >> str2;
