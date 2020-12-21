@@ -14,7 +14,17 @@
 class Point {
 public:
     double x, y;
+    Point() = default;
+
+	friend std::istream& operator >> (std::istream &, Point&);
 };
+
+std::istream& operator >> (std::istream &in, Point &point) {
+    in >> point.x;
+    in >> point.y;
+
+    return in;
+}
 
 bool Comp(const Point &a, const Point &b) {     // для сортировки
     return ((a.x < b.x) || (a.x == b.x && a.y < b.y));
@@ -32,7 +42,7 @@ double Dist(Point x, Point y) {     // дистанция между точка�
     return result;
 }
 
-std::vector<Point> SortForAndryu(std::vector<Point> &points_vec) {
+std::vector<Point> SortAndBuiilHullsForAndryu(std::vector<Point> &points_vec) {
     size_t k = 0;
     size_t vec_size = points_vec.size();
     std::vector<Point> hull(vec_size * 2);
@@ -69,14 +79,13 @@ std::vector<Point> Andryu(std::vector<Point> &points_vec) {     // алгори�
     }
     std::vector<Point> hull(vec_size * 2);
 
-    hull = SortForAndryu(points_vec);
+    hull = SortAndBuiilHullsForAndryu(points_vec);
 
     return hull;
 }
 
-double Solve(std::vector<Point> &point_vec) {
+double Perimeter(const std::vector<Point> &point_convex) {
     double dst = 0;
-    std::vector<Point> point_convex = Andryu(point_vec);
     size_t convex_size = point_convex.size();
 
     for (int i = 0; i < convex_size - 1; ++i) {
@@ -84,6 +93,15 @@ double Solve(std::vector<Point> &point_vec) {
     }
 
     dst += Dist(point_convex[0], point_convex[convex_size - 1]);
+
+    return dst;
+}
+
+double Solve(std::vector<Point> &point_vec) {
+    double dst = 0;
+    std::vector<Point> point_convex = Andryu(point_vec);
+
+    dst = Perimeter(point_convex);
 
     return dst;
 }
@@ -98,8 +116,9 @@ int main() {
 
     std::cin >> quantity;
     for (size_t i = 0; i < quantity; ++i) {
-        std::cin >> x >> y;
-        point_vec.push_back({x, y});
+        Point point_;
+        std::cin >> point_;
+        point_vec.push_back(point_);
     }
 
     dst = Solve(point_vec);
