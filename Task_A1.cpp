@@ -6,9 +6,9 @@
 // Арсений уснул. И приснилась ему планета Ка-Пэкс, на которой протекают две реки. Эти реки достаточно необычны для землян: 
 // они текут строго от одной точки до другой точки напрямую в пространстве (так как в сне Арсения планета вовсе не круглая). 
 // Арсений решил, что он хочет прорыть тоннель между реками. Так как он ленивый, то и копать много он не хочет. Помогите Арсению найти, сколько-таки ему придется прорыть.
-// https://contest.yandex.ru/contest/20642/run-report/45181654/
+// https://contest.yandex.ru/contest/20642/run-report/45731901/
 
-const double min_e = 0.00000001;
+const double MIN_E = 0.00000001;
 
 class Vector3D {    // любой отрезок в пространстве предвставим векторами, с помощью которых можно найти минимальное расстояние между ними
 public:
@@ -16,6 +16,7 @@ public:
 
     Vector3D(double x, double y, double z) : x(x), y(y), z(z) {}
 
+    Vector3D() = default;
 
     Vector3D operator - () {
         return Vector3D(-x, -y, -z);
@@ -44,18 +45,34 @@ public:
     friend double Dot(const Vector3D &v1, const Vector3D &v2) {
         return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z);
     }
+
+	friend std::istream& operator >> (std::istream &, Vector3D&);
 };
+
+std::istream& operator >> (std::istream &in, Vector3D &vec) {
+    in >> vec.x >> vec.y >> vec.z;
+    return in;
+}
+
 
 
 class Segment3D {   // отрезок
 public:
     Vector3D from, to;
 
+    Segment3D() = default;
+
     Segment3D(const Vector3D &from, const Vector3D &to) : from(from), to(to) {}
+
+    friend std::istream& operator >> (std::istream &, Segment3D&);
 };
 
+std::istream& operator >> (std::istream &in, Segment3D &segm) {
+    in >> segm.from >> segm.to;
+    return in;
+}
 
-std::vector<double> DistFromSegmentToSegment(Segment3D S1, Segment3D S2) {      // поиск расст-я от отрезка к другому отрезку
+std::vector<double> AuxiliaryVarsForFindingDist(Segment3D S1, Segment3D S2) {      // поиск расст-я от отрезка к другому отрезку
     const double zero = 0.0;
     Vector3D v1 = S1.to - S1.from;
     Vector3D v2 = S2.to - S2.from;
@@ -75,7 +92,7 @@ std::vector<double> DistFromSegmentToSegment(Segment3D S1, Segment3D S2) {      
     auxiliary_vars[4] = aux_diff;
     auxiliary_vars[5] = aux_diff;
 
-    if (aux_diff <= min_e) {
+    if (aux_diff <= MIN_E) {
         auxiliary_vars[1] = zero;
         auxiliary_vars[4] = static_cast<double>(static_cast<int>(zero) + 1);
         auxiliary_vars[3] = dist_v2;
@@ -127,15 +144,15 @@ std::vector<double> DistFromSegmentToSegment(Segment3D S1, Segment3D S2) {      
 }
 
 double FindingRequiredDist(Segment3D S1, Segment3D S2) {
-    std::vector<double> auxiliary_vars = DistFromSegmentToSegment(S1, S2);
+    std::vector<double> auxiliary_vars = AuxiliaryVarsForFindingDist(S1, S2);
 
     const double zero = 0.0;
     Vector3D v1 = S1.to - S1.from;
     Vector3D v2 = S2.to - S2.from;
     Vector3D v_delta = S1.from - S2.from;
 
-    auxiliary_vars[0] = (auxiliary_vars[1] <= min_e ? zero : auxiliary_vars[1] / auxiliary_vars[4]);
-    auxiliary_vars[2] = (auxiliary_vars[3] <= min_e ? zero : auxiliary_vars[3] / auxiliary_vars[5]);
+    auxiliary_vars[0] = (auxiliary_vars[1] <= MIN_E ? zero : auxiliary_vars[1] / auxiliary_vars[4]);
+    auxiliary_vars[2] = (auxiliary_vars[3] <= MIN_E ? zero : auxiliary_vars[3] / auxiliary_vars[5]);
 
     Vector3D final_vector = v_delta + (auxiliary_vars[0] * v1) - (auxiliary_vars[2] * v2);
 
@@ -146,12 +163,10 @@ double FindingRequiredDist(Segment3D S1, Segment3D S2) {
 int main() {
     std::ios::sync_with_stdio(false);
 
-    double x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4;
-    std::cin >> x1 >> y1 >> z1 >> x2 >> y2 >> z2;
-    std::cin >> x3 >> y3 >> z3 >> x4 >> y4 >> z4;
+    Segment3D Segm1, Segm2;
+    std::cin >> Segm1 >> Segm2;
 
-    std::cout << std::fixed << std::setprecision(6) << FindingRequiredDist(Segment3D(Vector3D(x1, y1, z1), Vector3D(x2, y2, z2)),
-                                        Segment3D(Vector3D(x3, y3, z3), Vector3D(x4, y4, z4)));
+    std::cout << std::fixed << std::setprecision(6) << FindingRequiredDist(Segm1, Segm2);
 
     //system("pause");
 } 
